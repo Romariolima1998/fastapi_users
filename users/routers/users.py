@@ -30,13 +30,17 @@ async def user_create(dados: UserCreateInput, session: Session):
         return user
     
     except SQLAlchemyError as error:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail='error saving to database')
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail=str(error))
     
 
 @router.get('/list')
 async def user_list(session: Session, offset: int = 0, limit: int = 10) -> list[UserCreateOutput]:
-    users = await session.scalars(
-        select(User).offset(offset).limit(limit)
-    )
+    try:
+        users = await session.scalars(
+            select(User).offset(offset).limit(limit)
+        )
 
-    return users.all()
+        return users.all()
+    
+    except SQLAlchemyError as error:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail=str(error))

@@ -7,3 +7,6 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str
     DATABASE_URL_ALEMBIC: str
+    TOKEN_EXPIRE: int
+    SECRET_KEY: str
+    ALGORITHM: str

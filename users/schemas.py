@@ -15,4 +15,12 @@ class UserCreateOutput(BaseModel):
     created_at: datetime
     update_at: datetime
 
+
+class TokenOutput(BaseModel):
+    access_token: str
+    token_type: str
+
+class MessageOutput(BaseModel):
+    message: str
+
     

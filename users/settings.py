@@ -10,3 +10,6 @@ class Settings(BaseSettings):
     TOKEN_EXPIRE: int
     SECRET_KEY: str
     ALGORITHM: str
+
+    #class Config:
+    #    env_file = '.env'

@@ -11,7 +11,7 @@ from users.security import create_access_token, get_current_user
 from users.schemas import TokenOutput
 
 
-router = APIRouter(prefix='/auth')
+router = APIRouter(prefix='/auth', tags=['auth'])
 
 
 @router.post('/token', response_model=TokenOutput)

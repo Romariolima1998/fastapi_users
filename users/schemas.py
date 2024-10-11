@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 
@@ -12,8 +12,15 @@ class UserCreateOutput(BaseModel):
     id: int
     username: str
     email: str
-    created_at: datetime
-    update_at: datetime
+    # created_at: datetime
+    # update_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+class UserUpdateInput(BaseModel):
+    username: str | None = None
+    password: str | None = None
+    email: str | None = None
 
 
 class TokenOutput(BaseModel):

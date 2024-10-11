@@ -23,22 +23,40 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 @router.post('/create',status_code=status.HTTP_201_CREATED, response_model=UserCreateOutput)
 async def user_create(dados: UserCreateInput, session: Session):
 
-    if not validate_email(dados.email):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='email invalid'
-        )
-
-    if not validate_password(dados.password):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='very weak password, must have at least 8 digits, a special character and an uppercase letter'
-        )
-
-
-    user = User(dados.username, hash(dados.password), dados.email)
-
     try:
+        user_username = await session.scalar(
+            select(User).where(User.username == dados.username)
+        )
+        if user_username:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='username alredy exists' )
+
+    
+        user_email = await session.scalar(
+                select(User).where(User.email == dados.email)
+            )
+        if user_email:
+            raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail='email alredy exists'
+                )
+    
+
+        if not validate_email(dados.email):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='email invalid'
+            )
+
+        if not validate_password(dados.password):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='very weak password, must have at least 8 digits, a special character and an uppercase letter'
+            )
+
+        user = User(dados.username, hash(dados.password), dados.email)
+
         session.add(user)
         await session.commit()
         await session.refresh(user)
@@ -46,6 +64,7 @@ async def user_create(dados: UserCreateInput, session: Session):
         return user
     
     except SQLAlchemyError as error:
+        await session.rollback()
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail=str(error))
     
 
@@ -67,7 +86,7 @@ async def user_update(id: int, dados:UserUpdateInput, session: Session, current_
 
     if current_user.id != id:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail='permission denid'
         )
     
@@ -128,7 +147,7 @@ async def user_delete(id: int, current_user: CurrentUser, session: Session) -> M
 
     if current_user.id != id:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail='permission denid'
         )
     

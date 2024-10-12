@@ -1,9 +1,8 @@
-version: '3.1'
+version: '3.7'
 
 services:
     postgresql:
         image: postgres
-        restart: always
         ports:
             - 5432:5432
         environment:
@@ -12,3 +11,16 @@ services:
             POSTGRES_DB: ${PG_DB}
         volumes:
             - /var/cache/pgdata:/var/lib/postgresql/data
+
+    users_app:
+        image: romaiolima/apiusers:1.0
+        build: .
+        entrypoint: ./entrypoint.sh
+        ports:
+            - "8000:8000"
+        depends_on:
+            - postgresql
+        environment:
+            - DATABASE_URL=postgresql+asyncpg://admin:admin@postgresql:5432/fastapi
+            - DATABASE_URL_ALEMBIC=postgresql+psycopg2://admin:admin@postgresql:5432/fastapi
+    

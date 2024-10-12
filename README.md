@@ -33,9 +33,9 @@ banco de dados assincrono com sqlalchemy utilizando o plugin asyncpg para a api 
 * docker-compose
 
 ### para rodar 
-git clone https://github.com/Romariolima1998/fastapi_users.git
+```git clone https://github.com/Romariolima1998/fastapi_users.git```
 
-cd fastapi_users
+```cd fastapi_users```
 
 "docker-compose"
 

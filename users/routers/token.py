@@ -3,6 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.future import select
+from fastapi_mail import MessageSchema
 
 from users.database.database import get_session
 from users.database.models import User
@@ -49,7 +50,7 @@ async def refresh_token(current_user: User = Depends(get_current_user)):
 
 @router.post('/password-recovery', response_model=MessageOutput)
 async def password_recovery(dados: PasswordRecoveryInput, session: AsyncSession = Depends(get_session)):
-    user = session.scalar(
+    user = await session.scalar(
         select(User).where(User.email == dados.email)
     )
 
@@ -60,6 +61,15 @@ async def password_recovery(dados: PasswordRecoveryInput, session: AsyncSession 
         )
     
     access_token = create_access_token(data={'sub': user.username})
-    email(user.email, 'Bearer '+ access_token)
+    
+    message = MessageSchema(
+        subject="Recuperação de senha",
+        recipients=[user.email],
+        body=f"Use o seguinte token para recuperar sua senha: {'Bearer '+ access_token}",
+        subtype="plain"
+    )
+    
+    fm = await email()
+    await fm.send_message(message)
 
     return{'message': 'check your email inbox'}

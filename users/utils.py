@@ -1,6 +1,6 @@
 import re
 
-from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
+from fastapi_mail import FastMail,  ConnectionConfig
 
 from users.settings import Settings
 
@@ -24,26 +24,23 @@ def validate_password(password: str) -> bool:
         return False
     
 
-async def email( email:str, token: str):
+async def email():
+    # va ate as configuracoes de seguranca do seu email authenticacao de 2 fatores
+    # e crie uma senha para aplicativo
     conf = ConnectionConfig(
-        MAIL_USERNAME = 'seu_email@gmail.com',
-        MAIL_PASSWORD = 'sua_senha',
-        MAIL_FROM = 'email',
+        MAIL_USERNAME = Settings().EMAIL,
+        MAIL_PASSWORD = Settings().PASSWORD,
+        MAIL_FROM = Settings().EMAIL,
         MAIL_PORT = 587,
         MAIL_SERVER = 'smtp.gmail.com',
-        MAIL_TLS = True,
-        MAIL_SSL = False
-    )
-
-    message = MessageSchema(
-        subject="Recuperação de senha",
-        recipients=[email],
-        body=f"Use o seguinte token para recuperar sua senha: {token}",
-        subtype="plain"
-    )
+        MAIL_STARTTLS = True,
+        MAIL_SSL_TLS = False
+    )    
 
     fm = FastMail(conf)
-    await fm.send_message(message)
+
+    return fm
+    
 
 
 

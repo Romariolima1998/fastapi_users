@@ -30,4 +30,8 @@ class TokenOutput(BaseModel):
 class MessageOutput(BaseModel):
     message: str
 
+
+class PasswordRecoveryInput(BaseModel):
+    email: str
+
     

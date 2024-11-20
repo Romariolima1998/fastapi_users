@@ -8,7 +8,8 @@ from users.database.database import get_session
 from users.database.models import User
 from users.security import verify
 from users.security import create_access_token, get_current_user
-from users.schemas import TokenOutput
+from users.schemas import TokenOutput, PasswordRecoveryInput, MessageOutput
+from users.utils import email
 
 
 router = APIRouter(prefix='/auth', tags=['auth'])
@@ -44,3 +45,21 @@ async def refresh_token(current_user: User = Depends(get_current_user)):
     access_token = create_access_token({'sub': current_user.username})
 
     return {'access_token': access_token, 'token_type': 'Bearer'}
+
+
+@router.post('/password-recovery', response_model=MessageOutput)
+async def password_recovery(dados: PasswordRecoveryInput, session: AsyncSession = Depends(get_session)):
+    user = session.scalar(
+        select(User).where(User.email == dados.email)
+    )
+
+    if not user:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            detail='email not exists'
+        )
+    
+    access_token = create_access_token(data={'sub': user.username})
+    email(user.email, 'Bearer '+ access_token)
+
+    return{'message': 'check your email inbox'}

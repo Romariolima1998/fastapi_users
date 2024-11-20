@@ -7,7 +7,9 @@ from sqlalchemy.future import select
 
 from users.database.database import get_session
 from users.database.models import User
-from users.schemas import UserCreateInput, UserCreateOutput, UserUpdateInput, MessageOutput
+from users.schemas import (UserCreateInput, UserCreateOutput,
+                           UserUpdateInput, MessageOutput,
+                           PasswordRecoveryInput)
 from users.security import hash
 from users.security import get_current_user
 from users.utils import validate_email, validate_password
@@ -155,3 +157,4 @@ async def user_delete(id: int, current_user: CurrentUser, session: Session) -> M
     await session.commit()
 
     return {'message': 'user deleted'}
+

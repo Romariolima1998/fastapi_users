@@ -1,5 +1,9 @@
 import re
 
+from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
+
+from users.settings import Settings
+
 def validate_email(email: str) -> bool:
     # Expressão regular para validar e-mail
     regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
@@ -18,6 +22,31 @@ def validate_password(password: str) -> bool:
         return True
     else:
         return False
+    
+
+async def email( email:str, token: str):
+    conf = ConnectionConfig(
+        MAIL_USERNAME = 'seu_email@gmail.com',
+        MAIL_PASSWORD = 'sua_senha',
+        MAIL_FROM = 'email',
+        MAIL_PORT = 587,
+        MAIL_SERVER = 'smtp.gmail.com',
+        MAIL_TLS = True,
+        MAIL_SSL = False
+    )
+
+    message = MessageSchema(
+        subject="Recuperação de senha",
+        recipients=[email],
+        body=f"Use o seguinte token para recuperar sua senha: {token}",
+        subtype="plain"
+    )
+
+    fm = FastMail(conf)
+    await fm.send_message(message)
+
+
+
 
 
 

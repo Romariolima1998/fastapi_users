@@ -27,6 +27,9 @@ class TokenOutput(BaseModel):
     access_token: str
     token_type: str
 
+class RevokedTokenInput(BaseModel):
+    token: str
+
 class MessageOutput(BaseModel):
     message: str
 
